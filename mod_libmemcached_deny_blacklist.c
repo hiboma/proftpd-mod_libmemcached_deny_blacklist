@@ -100,8 +100,8 @@ MODRET add_lmd_allow_user(cmd_rec *cmd) {
 
     CHECK_CONF(cmd, CONF_ROOT|CONF_GLOBAL);
 
-    /* argv => LMDBAllowUser nobody nobody1 nobody2 */
-    c = find_config(main_server->conf, CONF_PARAM, "LMDBAllowUser", FALSE);
+    /* argv => LMDBAllowedUser nobody nobody1 nobody2 */
+    c = find_config(main_server->conf, CONF_PARAM, "LMDBAllowedUser", FALSE);
     if(c && c->argv[0]) {
         explicit_users = c->argv[0];
     } else {
@@ -124,7 +124,7 @@ MODRET add_lmd_allow_user(cmd_rec *cmd) {
             exit(1);
         }
         pr_log_debug(DEBUG2,
-            "%s: add LMDBAllowUser[%d] %s", MODULE_NAME, i, account);
+            "%s: add LMDBAllowedUser[%d] %s", MODULE_NAME, i, account);
     }
 
     return PR_HANDLED(cmd);
@@ -141,7 +141,7 @@ MODRET add_lmd_allow_user_regex(cmd_rec *cmd) {
     CHECK_CONF(cmd, CONF_ROOT|CONF_GLOBAL);
 
     /* argv => LMDBAllowUserRegex ^test */
-    c = find_config(cmd->server->conf, CONF_PARAM, "LMDBAllowUserRegex", FALSE);
+    c = find_config(cmd->server->conf, CONF_PARAM, "LMDBAllowedUserRegex", FALSE);
     if(c && c->argv[0]) {
         list = c->argv[0];
     } else {
@@ -161,7 +161,7 @@ MODRET add_lmd_allow_user_regex(cmd_rec *cmd) {
         }
         *((regex_t **) push_array(list)) = preg;
         pr_log_debug(DEBUG2,
-            "%s: add LMDBAllowUserRegex[%d] %s", MODULE_NAME, i, cmd->argv[i]);
+            "%s: add LMDBAllowedUserRegex[%d] %s", MODULE_NAME, i, cmd->argv[i]);
     }
 
     return PR_HANDLED(cmd);
@@ -328,7 +328,7 @@ MODRET lmd_deny_blacklist_post_pass(cmd_rec *cmd) {
 static conftable lmd_deny_blacklist_conftab[] = {
     { "LMDBAllowedUser",      add_lmd_allow_user,       NULL },
     { "LMDBAllowedUserRegex", add_lmd_allow_user_regex, NULL },
-    { "LMDBMemcachedHost",  add_lmd_memcached_host,   NULL },
+    { "LMDBMemcachedHost",    add_lmd_memcached_host,   NULL },
     { NULL }
 };
  
