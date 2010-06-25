@@ -1,5 +1,5 @@
  
-                         mod_libmemcached_deny.c
+                    mod_libmemcached_deny_blacklist.c
                  =======================================
 
 ------------
@@ -13,62 +13,15 @@ usage
 ------------
 
     o memcachedを127.0.0.1で起動して用いるベーシックな使い方
-    o 全てのIPに制限がかかる
 
         LoadModule mod_libmemcached_deny.c
         <IfModule mod_libmemcached_deny.c>
            LMDMemcachedHost 127.0.0.1
         </IfModule>
         
-    o 192.168.0.1 からのログインはキャッシュがなくても許可する
-    
-        LMDMemcachedHost 127.0.0.1
-        LMDAllow         192.168.0.1    
-
-    o 192.168.0.0のサブネットからのログインはキャッシュがなくても許可する
-
-        LMDMemcachedHost 127.0.0.1
-        LMDAllow         192.168.0.
-
-        # CIDR
-        LMDMemcachedHost 127.0.0.1
-        LMDAllow         192.168.0.0/24
-
-    o hogeとfugaユーザーのみ キャッシュ確認する。
-    o その他のユーザーは確認しない
-        
-        LMDMemcachedHost 127.0.0.1
-        LMDApplyUser     hoge fuga
-
-    o 全てのユーザーでキャッシュ確認する      
-
-        LMDMemcachedHost 127.0.0.1
-        LMDApplyUserRegex  .*
-
 ------------
 memcached
 ------------
 
-    o memcachedには以下の形式で key と value をストアする必要があります
-
-        { "<account>@<proftpd hosts IP>" : "<clients IP>" }
-        
-    o 192.168.0.1のhogeアカウント には 192.168.0.2 から ログイン可能
-
-        { "hoge@192.168.0.1" : "192.168.0.2" }
-
-    o 複数のIPからのログインを許可したい場合は value をタブ区切りにします
+    o ログインを禁止したい場合はアカウント名かIPアドレスをキーにしてストアすれば良いです
     
-        { "<account>@<proftpd hosts IP>" : "<clients IP>\t<clients IP2>\t<clients IP3>" }
-        
-    o 192.168.0.1のhogeアカウント には 192.168.0.{2,3,4} からログイン可能
-    
-        { "hoge@192.168.0.1" : "192.168.0.2\t192.168.0.3\t192.168.0.4" } 
-
-    o ログインを禁止したい場合はキャッシュを消せばokです
-
-------------
-todo
-------------
-
-    o Deny from の制限と排他的になっちゃうのはどうしようかと 
