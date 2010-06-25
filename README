@@ -16,7 +16,7 @@ usage
 
         LoadModule mod_libmemcached_deny.c
         <IfModule mod_libmemcached_deny.c>
-           LMDMemcachedHost 127.0.0.1
+           LMDBMemcachedHost 127.0.0.1
         </IfModule>
         
 ------------
