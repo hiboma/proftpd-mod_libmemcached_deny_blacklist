@@ -290,7 +290,7 @@ MODRET lmd_deny_blacklist_post_pass(cmd_rec *cmd) {
 
     if(false == is_set_server) {
         pr_log_auth(PR_LOG_ERR, "%s: memcached_server not set", MODULE_NAME);
-        pr_response_send(R_530, _("Login denyied (server error)"));
+        pr_response_send(R_530, _("Login denied (server error)"));
         return PR_DECLINED(cmd);
     }
 
@@ -303,18 +303,18 @@ MODRET lmd_deny_blacklist_post_pass(cmd_rec *cmd) {
     /* check whether account is registerd in blacklist or not */
     if(is_cache_exits(memcached_deny_blacklist_mmc, account) == true) {
         pr_log_auth(PR_LOG_NOTICE,
-            "%s: denyied '%s@%s'. Account found in blacklist(memcached)",
+            "%s: denied '%s@%s'. Account found in blacklist(memcached)",
                  MODULE_NAME, account, remote_ip);
-        pr_response_send(R_530, _("Login denyied temporary (Account found in blacklist)"));
+        pr_response_send(R_530, _("Login denied temporary (Account found in blacklist)"));
         end_login(0);
     }
 
     /* check whether remote IP is registerd in blacklist or not */
     if(is_cache_exits(memcached_deny_blacklist_mmc, remote_ip) == true) {
         pr_log_auth(PR_LOG_NOTICE,
-            "%s: denyied '%s@%s'. IP found in blacklist(memcached)",
+            "%s: denied '%s@%s'. IP found in blacklist(memcached)",
                  MODULE_NAME, account, remote_ip);
-        pr_response_send(R_530, _("Login denyied temporary (IP found in blacklist)"));
+        pr_response_send(R_530, _("Login denied temporary (IP found in blacklist)"));
         end_login(0);
     }
 
