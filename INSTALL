@@ -23,9 +23,9 @@ Installation Instructions
        # not daemonize && print debug message
        $ /path/to/proftpd/sbin/proftpd --nodaemon -d10       
 
-4.  try to login ( will fail )
+4.  try to login ( will success )
 
-       $ ftp localhost
+       $ ftp hoge@localhost
 
 5.  start memcached
 
@@ -48,7 +48,7 @@ Installation Instructions
 
        # proftpd will deny 'hoge' and 127.0.0.1
 
-7.  try to login ( will success )
+7.  try to login ( will fail )
   
      $ ftp hoge@127.0.0.1
      Connected to localhost.
