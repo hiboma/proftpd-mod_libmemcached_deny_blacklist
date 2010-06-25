@@ -1,0 +1,62 @@
+------------------
+Build Requirements
+------------------
+
+        o DSO supported proftpd ( ./configure --enable-dso )
+        o libmemcached
+
+-------------------------
+Installation Instructions
+-------------------------
+        
+1.  build && install
+
+       $ sudo /path/to/proftpd/bin/prxs -c mod_libmemcached_deny_blacklist.c -l=memcached -L=/path/to/lib -i 
+
+2.  edit proftpd.conf
+
+       LoadModule mod_libmemcached_deny_blacklist.c
+       LMDMemcachedHost 127.0.0.1
+
+3.  start proftpd
+
+       # not daemonize && print debug message
+       $ /path/to/proftpd/sbin/proftpd --nodaemon -d10       
+
+4.  try to login ( will fail )
+
+       $ ftp localhost
+
+5.  start memcached
+
+       # with debug print 
+       $ memcached -vv
+
+6.  store cache value to memcached
+
+       # use your favoire client ...
+       $ telnet localhost 11211                                                                           
+       Trying 127.0.0.1...
+       Connected to localhost.
+       Escape character is '^]'.
+       set hoge 0 0 1
+       1
+       STORED
+       set 127.0.0.1 0 0 1
+       1
+       STORED
+
+       # proftpd will deny 'hoge' and 127.0.0.1
+
+7.  try to login ( will success )
+  
+     $ ftp hoge@127.0.0.1
+     Connected to localhost.
+     220 ProFTPD 1.3.2 Server (ProFTPD Default Installation) [127.0.0.1]
+     530 Login denyied temporary (Account found in blacklist)
+     ftp: Login failed
+     ftp: Can't connect or login to host `localhost'
+
+     # proftpd log
+     192.168.25.147 (localhost3[127.0.0.1]) - dispatching POST_CMD command 'USER hoge' to mod_libmemcached_deny_blacklist
+     192.168.25.147 (localhost3[127.0.0.1]) - libmemcached_deny_blacklist: denyied 'hoge@127.0.0.1'. Account found in blacklist(memcached)
