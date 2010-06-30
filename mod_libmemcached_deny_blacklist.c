@@ -24,6 +24,13 @@ static int walk_table(const void *key_data,
 }
 #endif
 
+static void lmd_cleanup() {
+    if(memcached_deny_blacklist_mmc) {
+        memcached_free(memcached_deny_blacklist_mmc);
+        memcached_deny_blacklist_mmc = NULL;
+    }
+}
+
 static void lmd_postparse_ev(const void *event_data, void *user_data) {
     memcached_stat_st *unused;
     memcached_return_t rc;
@@ -211,7 +218,7 @@ static bool is_cache_exits(memcached_st *mmc,
     uint32_t flag;
 
     /* todo */
-    timer_id = pr_timer_add(1, -1, NULL, lmd_timeout_callback, "memcached_get");
+    timer_id = pr_timer_add(3, -1, NULL, lmd_timeout_callback, "memcached_get");
     cached_value = memcached_get(mmc, key, strlen(key), &value_len, &flag, &rc);
     pr_timer_remove(timer_id, NULL);
 
@@ -280,7 +287,6 @@ MODRET lmd_deny_blacklist_post_pass(cmd_rec *cmd) {
       mod_authを通過するまでは session.userは空の様子
       const char *account  = session.user;
     */
-    const char *key = NULL;
     const char *account   = NULL;
     const char *remote_ip = NULL;
 
@@ -289,14 +295,15 @@ MODRET lmd_deny_blacklist_post_pass(cmd_rec *cmd) {
     remote_ip = pr_netaddr_get_ipstr(pr_netaddr_get_sess_remote_addr());
 
     if(false == is_set_server) {
-        pr_log_auth(PR_LOG_ERR, "%s: memcached_server not set", MODULE_NAME);
-        pr_response_send(R_530, _("Login denied (server error)"));
+        pr_log_auth(PR_LOG_WARNING, "%s: memcached_server not set", MODULE_NAME);
+        lmd_cleanup();
         return PR_DECLINED(cmd);
     }
 
     if(is_allowed_user(cmd, account) == true) {
         pr_log_auth(PR_LOG_NOTICE,
            "%s: '%s' is allowed to login. skip last process", MODULE_NAME, account);
+        lmd_cleanup();
         return PR_DECLINED(cmd);
     }
 
@@ -322,6 +329,7 @@ MODRET lmd_deny_blacklist_post_pass(cmd_rec *cmd) {
             "%s: not found in blaclist. '%s@%s' is allowed to Login",
                  MODULE_NAME, account, remote_ip);
 
+    lmd_cleanup();
     return PR_DECLINED(cmd);
 }
 
