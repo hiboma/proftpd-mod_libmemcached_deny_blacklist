@@ -1,11 +1,11 @@
  
 # mod_libmemcached_deny_blacklist.c
 
-## description
+## DESCRIPTION
 
 memcachedのキャッシュの有無で接続の許可/拒否をくだすproftpdモジュール
 
-## usage
+## USAGE
 
 memcachedを127.0.0.1で起動して用いるベーシックな使い方
 
