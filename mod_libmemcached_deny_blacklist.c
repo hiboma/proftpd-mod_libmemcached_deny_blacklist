@@ -359,7 +359,7 @@ MODRET lmd_deny_blacklist_post_pass(cmd_rec *cmd) {
     const char *remote_ip = NULL;
 
     /* return IP unless found hostname */
-    account = get_param_ptr(cmd->server->conf, C_USER, FALSE);
+    account = get_param_ptr(cmd->server->conf, "UserName", FALSE);
     remote_ip = pr_netaddr_get_ipstr(pr_netaddr_get_sess_remote_addr());
 
     if(false == is_set_server) {
