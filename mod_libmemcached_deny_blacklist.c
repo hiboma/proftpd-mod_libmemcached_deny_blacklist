@@ -207,7 +207,7 @@ MODRET add_lmd_allow_user(cmd_rec *cmd) {
 
 MODRET add_lmd_allow_user_regex(cmd_rec *cmd) {
     array_header *list;
-    regex_t *preg;
+    pr_regex_t *pre;
     int i, res;
     config_rec *c;
 
@@ -225,16 +225,16 @@ MODRET add_lmd_allow_user_regex(cmd_rec *cmd) {
     }
 
     for(i=1; i < cmd->argc; i++) {
-        preg = pr_regexp_alloc();
-        res  = regcomp(preg, cmd->argv[i], REG_NOSUB);
+        pre = pr_regexp_alloc(&libmemcached_deny_blacklist_module);
+        res = pr_regexp_compile(pre, cmd->argv[i], REG_NOSUB);
         if (res != 0) {
             char errstr[200] = {'\0'};
-            regerror(res, preg, errstr, sizeof(errstr));
-            pr_regexp_free(preg);
+            pr_regexp_error(res, pre, errstr, sizeof(errstr));
+            pr_regexp_free(NULL, pre);
             CONF_ERROR(cmd, pstrcat(cmd->tmp_pool, "'", cmd->argv[i], "' failed "
                "regex compilation: ", errstr, NULL));
         }
-        *((regex_t **) push_array(list)) = preg;
+        *((pr_regex_t **) push_array(list)) = pre;
         pr_log_debug(DEBUG2,
             "%s: add LMDBAllowedUserRegex[%d] %s", MODULE_NAME, i, cmd->argv[i]);
     }
