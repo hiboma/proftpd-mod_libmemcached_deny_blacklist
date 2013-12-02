@@ -33,7 +33,7 @@ static void lmd_cleanup() {
 
 static void lmd_postparse_ev(const void *event_data, void *user_data) {
     memcached_stat_st *unused;
-    memcached_return_t rc;
+    memcached_return rc;
 
     unused = memcached_stat(memcached_deny_blacklist_mmc, NULL, &rc);
     if(rc != MEMCACHED_SUCCESS) {
